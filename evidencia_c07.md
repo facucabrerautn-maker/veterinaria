@@ -17,7 +17,7 @@ Detalle de un turno con una práctica y con tres: la cantidad de consultas debe 
 ## Detalle de un turno con UNA práctica
 
 ```
-(pegar aquí las consultas de la consola)
+SELECT turno.id, turno.mascota_id, turno.fecha, turno.motivo, turno.total, mascota_1.id AS id_1, mascota_1.nombre, mascota_1.especie, mascota_1.duenio_id FROM turno LEFT OUTER JOIN mascota AS mascota_1 ON mascota_1.id = turno.mascota_id WHERE turno.id = $1::INTEGER
 ```
 
 Cantidad de consultas: ___
