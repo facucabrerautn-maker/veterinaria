@@ -1,7 +1,5 @@
 # Evidencia del caso C-07
 
-> **PENDIENTE: este archivo es una plantilla. Reemplazar los bloques vacíos con la salida real de la consola.**
-
 Detalle de un turno con una práctica y con tres: la cantidad de consultas debe ser la misma.
 
 ## Cómo generar la evidencia
