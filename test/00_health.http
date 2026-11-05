@@ -1,0 +1,10 @@
+@host = http://localhost:8000
+
+### Salud: el proceso está vivo (no toca la base)
+# Esperado: 200  {"estado": "vivo"}
+GET {{host}}/health/live
+
+### Salud: la base contesta (SELECT 1)
+# Esperado: 200 con la base en marcha. 503 si la base no contesta
+# (probar apagando PostgreSQL y repitiendo este pedido).
+GET {{host}}/health/ready

@@ -1,0 +1,128 @@
+@host = http://localhost:8000
+
+# Correr DESPUÉS de:  python reiniciar.py
+# Datos de partida: turno 1 (Toby) con dos prácticas: Consulta (1) y Desparasitación (2).
+# Este archivo está pensado para la extensión "REST Client" de VS Code.
+
+### C-06: turno válido con dos prácticas
+# Esperado: 201. Precios copiados del catálogo y total calculado por el servidor:
+# Consulta 15000.00 + Vacuna antirrábica 12000.00 = "27000.00"
+# (Ni el precio ni el total viajan en el cuerpo.)
+POST {{host}}/turnos/
+Content-Type: application/json
+
+{
+  "mascota_id": 1,
+  "fecha": "2026-11-12T10:30:00-03:00",
+  "motivo": "Control anual",
+  "practicas": [
+    { "practica_id": 1 },
+    { "practica_id": 3 }
+  ]
+}
+
+### RN-05: turno sin prácticas
+# Esperado: 422
+POST {{host}}/turnos/
+Content-Type: application/json
+
+{ "mascota_id": 1, "fecha": "2026-11-12T10:30:00-03:00", "motivo": "Sin prácticas", "practicas": [] }
+
+### Fecha sin zona horaria
+# Esperado: 422
+POST {{host}}/turnos/
+Content-Type: application/json
+
+{ "mascota_id": 1, "fecha": "2026-11-12T10:30:00", "motivo": "Fecha ingenua", "practicas": [ { "practica_id": 1 } ] }
+
+### RN-07: la misma práctica dos veces en un turno
+# Esperado: 409 (clave primaria compuesta); no queda guardado nada
+POST {{host}}/turnos/
+Content-Type: application/json
+
+{
+  "mascota_id": 1,
+  "fecha": "2026-11-13T10:30:00-03:00",
+  "motivo": "Práctica repetida",
+  "practicas": [ { "practica_id": 1 }, { "practica_id": 1 } ]
+}
+
+### C-04 (segunda parte): turno con una práctica inexistente
+# Esperado: 409; del turno no queda guardado nada
+# (verificarlo con test/verificaciones.sql)
+POST {{host}}/turnos/
+Content-Type: application/json
+
+{
+  "mascota_id": 1,
+  "fecha": "2026-11-14T10:30:00-03:00",
+  "motivo": "Práctica inexistente",
+  "practicas": [ { "practica_id": 1 }, { "practica_id": 9999 } ]
+}
+
+### Turno con una mascota inexistente
+# Esperado: 409; no queda guardado nada
+POST {{host}}/turnos/
+Content-Type: application/json
+
+{
+  "mascota_id": 9999,
+  "fecha": "2026-11-14T11:30:00-03:00",
+  "motivo": "Mascota inexistente",
+  "practicas": [ { "practica_id": 1 } ]
+}
+
+### C-07 (preparación): turno con UNA práctica
+# Esperado: 201
+# @name turnoUna
+POST {{host}}/turnos/
+Content-Type: application/json
+
+{
+  "mascota_id": 2,
+  "fecha": "2026-11-15T09:00:00-03:00",
+  "motivo": "Solo consulta",
+  "practicas": [ { "practica_id": 1 } ]
+}
+
+### C-07 (preparación): turno con TRES prácticas
+# Esperado: 201
+# @name turnoTres
+POST {{host}}/turnos/
+Content-Type: application/json
+
+{
+  "mascota_id": 3,
+  "fecha": "2026-11-15T10:00:00-03:00",
+  "motivo": "Control completo",
+  "practicas": [ { "practica_id": 1 }, { "practica_id": 2 }, { "practica_id": 3 } ]
+}
+
+### C-07: detalle del turno con UNA práctica
+# Esperado: 200. Con SQL_ECHO=true, mirar la consola y contar las consultas.
+GET {{host}}/turnos/{{turnoUna.response.body.id}}
+
+### C-07: detalle del turno con TRES prácticas
+# Esperado: 200 y la MISMA cantidad de consultas en la consola que en el pedido anterior.
+GET {{host}}/turnos/{{turnoTres.response.body.id}}
+
+### Detalle de un turno inexistente
+# Esperado: 404
+GET {{host}}/turnos/9999
+
+### Detalle de un id que no es entero
+# Esperado: 422
+GET {{host}}/turnos/abc
+
+### C-05 (segunda parte): borrar un turno
+# Esperado: 204. Sus prácticas ya no están (ON DELETE CASCADE):
+# verificarlo con test/verificaciones.sql
+DELETE {{host}}/turnos/1
+
+### El turno borrado ya no existe
+# Esperado: 404
+GET {{host}}/turnos/1
+
+### Borrar un turno inexistente
+# Esperado: 404
+DELETE {{host}}/turnos/9999

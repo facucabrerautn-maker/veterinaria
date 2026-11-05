@@ -1,0 +1,23 @@
+@host = http://localhost:8000
+
+### Stock informado por el laboratorio (tarda ~1 segundo)
+# Esperado: 200  {"vacuna": "triple", "stock": 16}   (10 + len("triple"))
+GET {{host}}/laboratorio/stock/triple
+
+### C-09 (manual): enviar rápidamente estos tres pedidos y, sin esperar, el de salud
+# Con REST Client: enviar los tres de laboratorio uno tras otro y, mientras
+# están en curso, enviar el GET /health/live. Debe responder de inmediato.
+# Para una prueba automática de esto usar:  python test/c09_concurrencia.py
+
+### Laboratorio 1
+GET {{host}}/laboratorio/stock/antirrabica
+
+### Laboratorio 2
+GET {{host}}/laboratorio/stock/quintuple
+
+### Laboratorio 3
+GET {{host}}/laboratorio/stock/parvovirus
+
+### Salud (debe responder de inmediato aunque haya consultas al laboratorio en marcha)
+# Esperado: 200 en pocos milisegundos
+GET {{host}}/health/live

@@ -1,0 +1,56 @@
+@host = http://localhost:8000
+
+# Correr DESPUÉS de:  python reiniciar.py
+
+### Alta de una mascota con un dueño que existe
+# Esperado: 201
+POST {{host}}/mascotas/
+Content-Type: application/json
+
+{ "nombre": "Rocky", "especie": "perro", "duenio_id": 2 }
+
+### C-04 (primera parte): mascota con un dueño inexistente
+# Esperado: 409 ("El dueño con id 9999 no existe.")
+POST {{host}}/mascotas/
+Content-Type: application/json
+
+{ "nombre": "Fantasma", "especie": "gato", "duenio_id": 9999 }
+
+### Alta con cuerpo inválido (falta la especie)
+# Esperado: 422
+POST {{host}}/mascotas/
+Content-Type: application/json
+
+{ "nombre": "Sin Especie", "duenio_id": 1 }
+
+### Detalle de una mascota (incluye a su dueño)
+# Esperado: 200 con "duenio": { id, nombre, email }
+GET {{host}}/mascotas/1
+
+### Mascota inexistente
+# Esperado: 404
+GET {{host}}/mascotas/9999
+
+### Listado: primera página con el tamaño por defecto (20)
+# Esperado: 200 con { items, total, page: 1, size: 20, pages: 1 }
+GET {{host}}/mascotas/
+
+### Listado: páginas de a 2
+# Esperado: 200, size 2, pages 2 (con las 3 mascotas iniciales), 2 items
+GET {{host}}/mascotas/?page=1&size=2
+
+### Listado: segunda página de a 2
+# Esperado: 200, 1 item
+GET {{host}}/mascotas/?page=2&size=2
+
+### Listado: una página más allá de "pages"
+# Esperado: 422
+GET {{host}}/mascotas/?page=3&size=2
+
+### Listado: size fuera de rango
+# Esperado: 422
+GET {{host}}/mascotas/?size=101
+
+### Listado: page cero
+# Esperado: 422
+GET {{host}}/mascotas/?page=0

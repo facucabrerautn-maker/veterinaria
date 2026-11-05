@@ -1,0 +1,35 @@
+@host = http://localhost:8000
+
+# Correr DESPUÉS de:  python reiniciar.py
+
+### Catálogo de prácticas
+# Esperado: 200 con 4 prácticas (precios como texto con dos decimales)
+GET {{host}}/practicas/
+
+### Alta de una práctica
+# Esperado: 201
+POST {{host}}/practicas/
+Content-Type: application/json
+
+{ "nombre": "Radiografía", "precio": "20000.00" }
+
+### C-02: nombre de práctica repetido
+# Esperado: 409 con mensaje propio
+POST {{host}}/practicas/
+Content-Type: application/json
+
+{ "nombre": "Consulta", "precio": "1000.00" }
+
+### RN-04: precio cero
+# Esperado: 422 (la validación del DTO responde antes que la base)
+POST {{host}}/practicas/
+Content-Type: application/json
+
+{ "nombre": "Gratis", "precio": "0" }
+
+### RN-04: precio negativo
+# Esperado: 422
+POST {{host}}/practicas/
+Content-Type: application/json
+
+{ "nombre": "Negativa", "precio": "-5" }
