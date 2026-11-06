@@ -1,4 +1,5 @@
 # Veterinaria — API con FastAPI y PostgreSQL
+## Integrantes: Facundo Cabrera, Nahuel Olmos, Agustin Pereyra, Ignacio Ariza
 
 Trabajo práctico de Programación III (Tecnicatura Universitaria en Programación, UTN).
 API asincrónica para registrar dueños, mascotas, prácticas y turnos de una veterinaria.
